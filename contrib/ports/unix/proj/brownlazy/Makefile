@@ -55,7 +55,7 @@ ARFLAGS=rs
 LWIPDIR=$(CONTRIBDIR)/../lwip/src
 
 CFLAGS:=$(CFLAGS) \
-	-I. -I$(CONTRIBDIR)/apps/httpserver_raw \
+	-I.\
 	-I$(LWIPDIR)/include -I$(LWIPARCH)/include -I$(LWIPDIR)/include/ipv4 \
 	-I$(LWIPDIR)
 
@@ -93,7 +93,7 @@ NETIFFILES+=$(LWIPDIR)/netif/ppp/auth.c $(LWIPDIR)/netif/ppp/chap.c \
 ARCHFILES=$(wildcard $(LWIPARCH)/*.c $(LWIPARCH)/netif/tapif.c $(LWIPARCH)/netif/tunif.c $(LWIPARCH)/netif/unixif.c $(LWIPARCH)/netif/list.c $(LWIPARCH)/netif/tcpdump.c)
 
 # APPFILES: Applications.
-APPFILES=$(CONTRIBDIR)/apps/httpserver_raw/fs.c $(CONTRIBDIR)/apps/httpserver_raw/httpd.c
+APPFILES=
 	
 
 # LWIPFILES: All the above.

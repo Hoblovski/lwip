@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdio.h>
 
 #include "lwip/sys.h"
 #include "lwip/opt.h"
@@ -127,6 +128,9 @@ introduce_thread(pthread_t id)
 sys_thread_t
 sys_thread_new(const char *name, lwip_thread_fn function, void *arg, int stacksize, int prio)
 {
+#if SYSSVC_WATCH
+  printf("sys_thread_new\n");
+#endif
   int code;
   pthread_t tmp;
   struct sys_thread *st = NULL;
@@ -155,6 +159,9 @@ sys_thread_new(const char *name, lwip_thread_fn function, void *arg, int stacksi
 err_t
 sys_mbox_new(struct sys_mbox **mb, int size)
 {
+#if SYSSVC_WATCH
+  printf("sys_mbox_new\n");
+#endif
   struct sys_mbox *mbox;
   LWIP_UNUSED_ARG(size);
 
@@ -176,6 +183,9 @@ sys_mbox_new(struct sys_mbox **mb, int size)
 void
 sys_mbox_free(struct sys_mbox **mb)
 {
+#if SYSSVC_WATCH
+  printf("sys_mbox_free\n");
+#endif
   if ((mb != NULL) && (*mb != SYS_MBOX_NULL)) {
     struct sys_mbox *mbox = *mb;
     SYS_STATS_DEC(mbox.used);
@@ -193,6 +203,9 @@ sys_mbox_free(struct sys_mbox **mb)
 err_t
 sys_mbox_trypost(struct sys_mbox **mb, void *msg)
 {
+#if SYSSVC_WATCH
+  printf("sys_mbox_trypost\n");
+#endif
   u8_t first;
   struct sys_mbox *mbox;
   LWIP_ASSERT("invalid mbox", (mb != NULL) && (*mb != NULL));
@@ -230,6 +243,9 @@ sys_mbox_trypost(struct sys_mbox **mb, void *msg)
 void
 sys_mbox_post(struct sys_mbox **mb, void *msg)
 {
+#if SYSSVC_WATCH
+  printf("sys_mbox_post\n");
+#endif
   u8_t first;
   struct sys_mbox *mbox;
   LWIP_ASSERT("invalid mbox", (mb != NULL) && (*mb != NULL));
@@ -267,6 +283,9 @@ sys_mbox_post(struct sys_mbox **mb, void *msg)
 u32_t
 sys_arch_mbox_tryfetch(struct sys_mbox **mb, void **msg)
 {
+#if SYSSVC_WATCH
+  printf("sys_arch_mbox_tryfetch\n");
+#endif
   struct sys_mbox *mbox;
   LWIP_ASSERT("invalid mbox", (mb != NULL) && (*mb != NULL));
   mbox = *mb;
@@ -300,6 +319,9 @@ sys_arch_mbox_tryfetch(struct sys_mbox **mb, void **msg)
 u32_t
 sys_arch_mbox_fetch(struct sys_mbox **mb, void **msg, u32_t timeout)
 {
+#if SYSSVC_WATCH
+  printf("sys_arch_mbox_fetch\n");
+#endif
   u32_t time_needed = 0;
   struct sys_mbox *mbox;
   LWIP_ASSERT("invalid mbox", (mb != NULL) && (*mb != NULL));
@@ -363,6 +385,9 @@ sys_sem_new_internal(u8_t count)
 err_t
 sys_sem_new(struct sys_sem **sem, u8_t count)
 {
+#if SYSSVC_WATCH
+  printf("sys_sem_new\n");
+#endif
   SYS_STATS_INC_USED(sem);
   *sem = sys_sem_new_internal(count);
   if (*sem == NULL) {
@@ -416,6 +441,9 @@ cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex, u32_t timeout)
 u32_t
 sys_arch_sem_wait(struct sys_sem **s, u32_t timeout)
 {
+#if SYSSVC_WATCH
+  printf("sys_arch_sem_wait\n");
+#endif
   u32_t time_needed = 0;
   struct sys_sem *sem;
   LWIP_ASSERT("invalid sem", (s != NULL) && (*s != NULL));
@@ -444,6 +472,9 @@ sys_arch_sem_wait(struct sys_sem **s, u32_t timeout)
 void
 sys_sem_signal(struct sys_sem **s)
 {
+#if SYSSVC_WATCH
+  printf("sys_sem_signal\n");
+#endif
   struct sys_sem *sem;
   LWIP_ASSERT("invalid sem", (s != NULL) && (*s != NULL));
   sem = *s;
@@ -470,6 +501,9 @@ sys_sem_free_internal(struct sys_sem *sem)
 void
 sys_sem_free(struct sys_sem **sem)
 {
+#if SYSSVC_WATCH
+  printf("sys_sem_free\n");
+#endif
   if ((sem != NULL) && (*sem != SYS_SEM_NULL)) {
     SYS_STATS_DEC(sem.used);
     sys_sem_free_internal(*sem);
@@ -480,6 +514,9 @@ sys_sem_free(struct sys_sem **sem)
 u32_t
 sys_now(void)
 {
+#if SYSSVC_WATCH
+  printf("sys_now\n");
+#endif
   struct timeval tv;
   u32_t sec, usec, msec;
   gettimeofday(&tv, NULL);
@@ -494,6 +531,9 @@ sys_now(void)
 void
 sys_init(void)
 {
+#if SYSSVC_WATCH
+  printf("sys_init\n");
+#endif
   gettimeofday(&starttime, NULL);
 }
 /*-----------------------------------------------------------------------------------*/
@@ -515,6 +555,9 @@ system.
 sys_prot_t
 sys_arch_protect(void)
 {
+#if SYSSVC_WATCH
+  printf("sys_arch_protect\n");
+#endif
     /* Note that for the UNIX port, we are using a lightweight mutex, and our
      * own counter (which is locked by the mutex). The return code is not actually
      * used. */
@@ -542,6 +585,9 @@ an operating system.
 void
 sys_arch_unprotect(sys_prot_t pval)
 {
+#if SYSSVC_WATCH
+  printf("sys_arch_unprotect\n");
+#endif
     LWIP_UNUSED_ARG(pval);
     if (lwprot_thread == pthread_self())
     {
@@ -567,6 +613,9 @@ sys_arch_unprotect(sys_prot_t pval)
 u32_t
 sys_jiffies(void)
 {
+#if SYSSVC_WATCH
+  printf("sys_jiffies\n");
+#endif
     struct timeval tv;
     unsigned long sec;
     long usec;

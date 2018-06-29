@@ -143,7 +143,7 @@ low_level_init(struct netif *netif)
 
   LWIP_DEBUGF(TAPIF_DEBUG, ("tapif_init: system(\"%s\");\n", buf));
   system(buf);
-  printf("system'ed: %s", buf);
+  printf("system'ed: %s\n", buf);
   sys_thread_new("tapif_thread", tapif_thread, netif, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
 
 }

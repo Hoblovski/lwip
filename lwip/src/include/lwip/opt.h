@@ -2040,4 +2040,11 @@
 #define DNS_DEBUG                       LWIP_DBG_OFF
 #endif
 
+/**
+ * SYSSVC_WATCH: print message each time a system service is called
+ */
+#ifndef SYSSVC_WATCH
+#define SYSSVC_WATCH                    0
+#endif
+
 #endif /* __LWIP_OPT_H__ */
