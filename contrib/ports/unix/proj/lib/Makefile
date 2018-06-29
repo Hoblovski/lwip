@@ -74,7 +74,7 @@ LWIPOBJS=$(notdir $(LWIPFILESW:.c=.o))
 LWIPLIB=liblwip.so
 
 %.o:
-	$(CC) $(CFLAGS) -c $(<:.o=.c)
+	$(CC) $(CFLAGS) -c -fPIC $(<:.o=.c)
 
 all: $(LWIPLIB) 
 .PHONY: all

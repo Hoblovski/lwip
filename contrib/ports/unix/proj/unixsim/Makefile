@@ -55,8 +55,7 @@ ARFLAGS=rs
 LWIPDIR=$(CONTRIBDIR)/../lwip/src
 
 CFLAGS:=$(CFLAGS) \
-	-I. -I$(CONTRIBDIR)/apps/httpserver_raw -I$(CONTRIBDIR)/apps/shell \
-	-I$(CONTRIBDIR)/apps/tcpecho -I$(CONTRIBDIR)/apps/udpecho \
+	-I. -I$(CONTRIBDIR)/apps/httpserver_raw \
 	-I$(LWIPDIR)/include -I$(LWIPARCH)/include -I$(LWIPDIR)/include/ipv4 \
 	-I$(LWIPDIR)
 
@@ -94,9 +93,8 @@ NETIFFILES+=$(LWIPDIR)/netif/ppp/auth.c $(LWIPDIR)/netif/ppp/chap.c \
 ARCHFILES=$(wildcard $(LWIPARCH)/*.c $(LWIPARCH)/netif/tapif.c $(LWIPARCH)/netif/tunif.c $(LWIPARCH)/netif/unixif.c $(LWIPARCH)/netif/list.c $(LWIPARCH)/netif/tcpdump.c)
 
 # APPFILES: Applications.
-APPFILES=$(CONTRIBDIR)/apps/httpserver_raw/fs.c $(CONTRIBDIR)/apps/httpserver_raw/httpd.c \
-	$(CONTRIBDIR)/apps/udpecho/udpecho.c $(CONTRIBDIR)/apps/tcpecho/tcpecho.c \
-	$(CONTRIBDIR)/apps/shell/shell.c
+APPFILES=$(CONTRIBDIR)/apps/httpserver_raw/fs.c $(CONTRIBDIR)/apps/httpserver_raw/httpd.c
+	
 
 # LWIPFILES: All the above.
 LWIPFILES=$(COREFILES) $(CORE4FILES) $(SNMPFILES) $(APIFILES) $(NETIFFILES) $(ARCHFILES)
@@ -114,7 +112,7 @@ all ipv4 compile: simhost
 .PHONY: all
 
 clean:
-	rm -f *.o $(LWIPLIB) $(APPLIB) simhost simnode simrouter *.s .depend* *.core core
+	rm -f *.o $(LWIPLIB) $(APPLIB) simhost *.s .depend* *.core core
 
 depend dep: .depend
 
@@ -126,15 +124,9 @@ $(APPLIB): $(APPOBJS)
 $(LWIPLIB): $(LWIPOBJS)
 	$(AR) $(ARFLAGS) $(LWIPLIB) $?
 
-.depend: simhost.c simnode.c simrouter.c $(LWIPFILES) $(APPFILES)
+.depend: simhost.c $(LWIPFILES) $(APPFILES)
 	$(CCDEP) $(CFLAGS) -MM $^ > .depend || rm -f .depend
 
 simhost: .depend $(LWIPLIB) $(APPLIB) simhost.o $(APPFILES)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o simhost simhost.o $(APPLIB) $(LWIPLIB)
-
-simrouter: .depend $(LWIPLIB) $(APPLIB) simrouter.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o simrouter simrouter.o $(APPLIB) $(LWIPLIB) 
-
-simnode: .depend $(LWIPLIB) $(APPLIB) simnode.o 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o simnode simnode.o $(APPLIB) $(LWIPLIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o simhost simhost.o -static $(APPLIB) $(LWIPLIB)
 
