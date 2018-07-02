@@ -38,7 +38,7 @@
 
 #include "lwip/opt.h"
 
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet_chksum.h"
 #include "lwip/def.h"
 
 #include <stddef.h>

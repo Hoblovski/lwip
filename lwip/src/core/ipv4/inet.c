@@ -38,5 +38,5 @@
 
 #include "lwip/opt.h"
 
-#include "lwip/inet.h"
+#include "ipv4/inet.h"
 

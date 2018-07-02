@@ -40,8 +40,8 @@
 #include "lwip/sys.h"
 #include "lwip/mem.h"
 #include "lwip/pbuf.h"
-#include "lwip/ip.h"
-#include "lwip/icmp.h"
+#include "ipv4/ip.h"
+#include "ipv4/icmp.h"
 #include "lwip/err.h"
 
 #ifdef __cplusplus

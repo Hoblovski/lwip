@@ -8,7 +8,7 @@
 #include "lwip/arch.h"
 
 /* Following #undefs are here to keep compiler from issuing warnings
-   about them being double defined. (They are defined in lwip/inet.h
+   about them being double defined. (They are defined in ipv4/inet.h
    as well as the Unix #includes below.) */
 #undef htonl
 #undef ntohl

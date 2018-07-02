@@ -45,15 +45,15 @@
 #include "lwip/sockets.h"
 #include "lwip/api.h"
 #include "lwip/sys.h"
-#include "lwip/igmp.h"
-#include "lwip/inet.h"
+#include "ipv4/igmp.h"
+#include "ipv4/inet.h"
 #include "lwip/tcp.h"
 #include "lwip/raw.h"
 #include "lwip/udp.h"
 #include "lwip/tcpip.h"
 #include "lwip/pbuf.h"
 #if LWIP_CHECKSUM_ON_COPY
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet_chksum.h"
 #endif
 
 #include <string.h>

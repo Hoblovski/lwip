@@ -47,7 +47,7 @@
 #include "lwip/tcpip.h"
 #include "lwip/memp.h"
 
-#include "lwip/ip.h"
+#include "ipv4/ip.h"
 #include "lwip/raw.h"
 #include "lwip/udp.h"
 #include "lwip/tcp.h"

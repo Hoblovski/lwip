@@ -68,9 +68,9 @@
 
 #include "lwip/mem.h"
 #include "lwip/udp.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/netif.h"
-#include "lwip/autoip.h"
+#include "ipv4/autoip.h"
 #include "netif/etharp.h"
 
 #include <stdlib.h>

@@ -43,9 +43,9 @@
 
 #if LWIP_ICMP /* don't build if not configured for use in lwipopts.h */
 
-#include "lwip/icmp.h"
-#include "lwip/inet_chksum.h"
-#include "lwip/ip.h"
+#include "ipv4/icmp.h"
+#include "ipv4/inet_chksum.h"
+#include "ipv4/ip.h"
 #include "lwip/def.h"
 #include "lwip/stats.h"
 #include "lwip/snmp.h"

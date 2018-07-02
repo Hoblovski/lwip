@@ -40,7 +40,7 @@
 
 #include "lwip/netbuf.h"
 #include "lwip/sys.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/err.h"
 
 #ifdef __cplusplus

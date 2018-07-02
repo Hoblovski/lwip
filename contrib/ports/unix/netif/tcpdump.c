@@ -33,11 +33,11 @@
 #include <stdio.h>
   
 #include "netif/tcpdump.h"
-#include "lwip/ip.h"
+#include "ipv4/ip.h"
 #include "lwip/tcp_impl.h"
 #include "lwip/udp.h"
-#include "lwip/inet.h"
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet.h"
+#include "ipv4/inet_chksum.h"
 
 #ifndef TCPDUMP_DEBUG
 #define TCPDUMP_DEBUG LWIP_DBG_OFF

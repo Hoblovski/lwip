@@ -41,7 +41,6 @@
 #include "lwip/sys.h"
 #include "lwip/stats.h"
 #include "lwip/tcp_impl.h"
-#include "lwip/inet_chksum.h"
 #include "lwip/tcpip.h"
 #include "lwip/sockets.h"
 #include "netif/tapif.h"
@@ -50,7 +49,7 @@
 #include "netif/dropif.h"
 #include "netif/pcapif.h"
 #include "netif/tcpdump.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 
 
 unsigned char debug_flags = LWIP_DBG_OFF;

@@ -35,7 +35,7 @@
 
 #include <stddef.h> /* for size_t */
 
-#include "lwip/inet.h"
+#include "ipv4/inet.h"
 #include "lwip/sockets.h"
 
 #ifdef __cplusplus

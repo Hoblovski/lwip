@@ -40,8 +40,8 @@
 
 #include <stddef.h> /* for size_t */
 
-#include "lwip/ip_addr.h"
-#include "lwip/inet.h"
+#include "ipv4/ip_addr.h"
+#include "ipv4/inet.h"
 
 #ifdef __cplusplus
 extern "C" {

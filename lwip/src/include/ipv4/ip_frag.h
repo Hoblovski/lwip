@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
+ * Copyright (c) 2001-2004 Swedish Institute of Computer Science.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -26,48 +26,63 @@
  *
  * This file is part of the lwIP TCP/IP stack.
  * 
- * Author: Adam Dunkels <adam@sics.se>
+ * Author: Jani Monoses <jani@iv.ro>
  *
  */
 
-#include "lwip/debug.h"
+#ifndef __LWIP_IP_FRAG_H__
+#define __LWIP_IP_FRAG_H__
 
-#include "lwip/arch.h"
+#include "lwip/opt.h"
+#include "lwip/err.h"
+#include "lwip/pbuf.h"
+#include "lwip/netif.h"
+#include "ipv4/ip_addr.h"
+#include "ipv4/ip.h"
 
-#include "lwip/def.h"
-#include "ipv4/inet.h"
-
-
-/*-----------------------------------------------------------------------------------*/
-/* lwip_chksum:
- *
- * Sums up all 16 bit words in a memory portion. Also includes any odd byte.
- * This function is used by the other checksum functions.
- *
- */
-/*-----------------------------------------------------------------------------------*/
-#if 0
-u16_t
-lwip_chksum(void *dataptr, int len)
-{
-  u32_t acc;
-    
-  for(acc = 0; len > 1; len -= 2) {
-    acc += *((u16_t *)dataptr)++;
-  }
-
-  /* add up any odd byte */
-  if (len == 1) {
-    acc += htons((u16_t)((*(u8_t *)dataptr) & 0xff) << 8);
-    LWIP_DEBUGF(INET_DEBUG, ("inet: chksum: odd byte %d\n", *(u8_t *)dataptr));
-  }
-  acc = (acc >> 16) + (acc & 0xffffUL);
-
-  if (acc & 0xffff0000 != 0) {
-    acc = (acc >> 16) + (acc & 0xffffUL);
-  }
-
-  return (u16_t)acc;
-}
-/*-----------------------------------------------------------------------------------*/
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#if IP_REASSEMBLY
+/* The IP reassembly timer interval in milliseconds. */
+#define IP_TMR_INTERVAL 1000
+
+/* IP reassembly helper struct.
+ * This is exported because memp needs to know the size.
+ */
+struct ip_reassdata {
+  struct ip_reassdata *next;
+  struct pbuf *p;
+  struct ip_hdr iphdr;
+  u16_t datagram_len;
+  u8_t flags;
+  u8_t timer;
+};
+
+void ip_reass_init(void);
+void ip_reass_tmr(void);
+struct pbuf * ip_reass(struct pbuf *p);
+#endif /* IP_REASSEMBLY */
+
+#if IP_FRAG
+#if !IP_FRAG_USES_STATIC_BUF && !LWIP_NETIF_TX_SINGLE_PBUF
+/** A custom pbuf that holds a reference to another pbuf, which is freed
+ * when this custom pbuf is freed. This is used to create a custom PBUF_REF
+ * that points into the original pbuf. */
+struct pbuf_custom_ref {
+  /** 'base class' */
+  struct pbuf_custom pc;
+  /** pointer to the original pbuf that is referenced */
+  struct pbuf *original;
+};
+#endif /* !IP_FRAG_USES_STATIC_BUF && !LWIP_NETIF_TX_SINGLE_PBUF */
+
+err_t ip_frag(struct pbuf *p, struct netif *netif, ip_addr_t *dest);
+#endif /* IP_FRAG */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __LWIP_IP_FRAG_H__ */

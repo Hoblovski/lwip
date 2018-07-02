@@ -34,7 +34,7 @@
 
 #include "lwip/opt.h"
 #include "lwip/pbuf.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 
 #ifdef __cplusplus
 extern "C" {

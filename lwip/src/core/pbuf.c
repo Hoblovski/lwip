@@ -74,7 +74,7 @@
 #include "lwip/tcp_impl.h"
 #endif
 #if LWIP_CHECKSUM_ON_COPY
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet_chksum.h"
 #endif
 
 #include <string.h>

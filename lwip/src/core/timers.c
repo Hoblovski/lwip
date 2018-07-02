@@ -50,11 +50,11 @@
 #include "lwip/memp.h"
 #include "lwip/tcpip.h"
 
-#include "lwip/ip_frag.h"
+#include "ipv4/ip_frag.h"
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
-#include "lwip/autoip.h"
-#include "lwip/igmp.h"
+#include "ipv4/autoip.h"
+#include "ipv4/igmp.h"
 #include "lwip/dns.h"
 
 

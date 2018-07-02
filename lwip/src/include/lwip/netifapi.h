@@ -35,7 +35,7 @@
 #include "lwip/sys.h"
 #include "lwip/netif.h"
 #include "lwip/dhcp.h"
-#include "lwip/autoip.h"
+#include "ipv4/autoip.h"
 
 #ifdef __cplusplus
 extern "C" {

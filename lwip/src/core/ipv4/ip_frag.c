@@ -39,13 +39,13 @@
  */
 
 #include "lwip/opt.h"
-#include "lwip/ip_frag.h"
+#include "ipv4/ip_frag.h"
 #include "lwip/def.h"
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet_chksum.h"
 #include "lwip/netif.h"
 #include "lwip/snmp.h"
 #include "lwip/stats.h"
-#include "lwip/icmp.h"
+#include "ipv4/icmp.h"
 
 #include <string.h>
 

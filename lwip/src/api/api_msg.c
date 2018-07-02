@@ -42,14 +42,14 @@
 
 #include "lwip/api_msg.h"
 
-#include "lwip/ip.h"
+#include "ipv4/ip.h"
 #include "lwip/udp.h"
 #include "lwip/tcp.h"
 #include "lwip/raw.h"
 
 #include "lwip/memp.h"
 #include "lwip/tcpip.h"
-#include "lwip/igmp.h"
+#include "ipv4/igmp.h"
 #include "lwip/dns.h"
 
 #include <string.h>

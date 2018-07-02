@@ -58,7 +58,7 @@
 #include "netif/unixif.h"
 #include "lwip/sys.h"
 
-#include "lwip/ip.h"
+#include "ipv4/ip.h"
 
 
 #if defined(LWIP_DEBUG) && defined(LWIP_TCPDUMP)

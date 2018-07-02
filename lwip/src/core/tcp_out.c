@@ -47,9 +47,9 @@
 #include "lwip/mem.h"
 #include "lwip/memp.h"
 #include "lwip/sys.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/netif.h"
-#include "lwip/inet_chksum.h"
+#include "ipv4/inet_chksum.h"
 #include "lwip/stats.h"
 #include "lwip/snmp.h"
 

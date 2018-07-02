@@ -38,8 +38,8 @@
 
 #include "lwip/pbuf.h"
 #include "lwip/netif.h"
-#include "lwip/ip_addr.h"
-#include "lwip/ip.h"
+#include "ipv4/ip_addr.h"
+#include "ipv4/ip.h"
 
 #ifdef __cplusplus
 extern "C" {

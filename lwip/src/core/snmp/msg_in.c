@@ -40,7 +40,7 @@
 #include "lwip/snmp_asn1.h"
 #include "lwip/snmp_msg.h"
 #include "lwip/snmp_structs.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/memp.h"
 #include "lwip/udp.h"
 #include "lwip/stats.h"

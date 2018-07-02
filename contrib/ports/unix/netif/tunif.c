@@ -46,7 +46,7 @@
 
 #include "lwip/opt.h"
 #include "lwip/def.h"
-#include "lwip/ip.h"
+#include "ipv4/ip.h"
 #include "lwip/mem.h"
 #include "lwip/netif.h"
 #include "lwip/pbuf.h"

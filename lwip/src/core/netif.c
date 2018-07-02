@@ -39,11 +39,11 @@
 #include "lwip/opt.h"
 
 #include "lwip/def.h"
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/netif.h"
 #include "lwip/tcp_impl.h"
 #include "lwip/snmp.h"
-#include "lwip/igmp.h"
+#include "ipv4/igmp.h"
 #include "netif/etharp.h"
 #include "lwip/stats.h"
 #if ENABLE_LOOPBACK
@@ -54,7 +54,7 @@
 #endif /* ENABLE_LOOPBACK */
 
 #if LWIP_AUTOIP
-#include "lwip/autoip.h"
+#include "ipv4/autoip.h"
 #endif /* LWIP_AUTOIP */
 #if LWIP_DHCP
 #include "lwip/dhcp.h"

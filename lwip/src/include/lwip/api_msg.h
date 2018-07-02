@@ -38,10 +38,10 @@
 
 #include <stddef.h> /* for size_t */
 
-#include "lwip/ip_addr.h"
+#include "ipv4/ip_addr.h"
 #include "lwip/err.h"
 #include "lwip/sys.h"
-#include "lwip/igmp.h"
+#include "ipv4/igmp.h"
 #include "lwip/api.h"
 
 #ifdef __cplusplus
