@@ -61,45 +61,83 @@ struct netif netif;
 #define SEND_STR "brown lazy"
 #define SEND_LEN 10
 
-static void 
+static void
 brownlazy_main(void *arg)
 {
+    printf("brownlazy_main(): hello\n");
     int listenfd;
     struct sockaddr_in brownlazy_saddr, brownlazy_caddr;
     LWIP_UNUSED_ARG(arg);
 
     /* First acquire our socket for listening for connections */
-    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+    listenfd = lwip_socket(AF_INET, SOCK_STREAM, 0);
 
-    LWIP_ASSERT("brownlazy_main(): Socket create failed.", listenfd >= 0);
+    LWIP_ASSERT("brownlazy_main(): socket create failed.", listenfd >= 0);
     memset(&brownlazy_saddr, 0, sizeof(brownlazy_saddr));
     brownlazy_saddr.sin_family = AF_INET;
     brownlazy_saddr.sin_addr.s_addr = PP_HTONL(INADDR_ANY);
     brownlazy_saddr.sin_port = htons(19);     /* Chargen server port */
 
-    if (bind(listenfd, (struct sockaddr *) &brownlazy_saddr, sizeof(brownlazy_saddr)) == -1)
-        LWIP_ASSERT("brownlazy_main(): Socket bind failed.", 0);
+    if (lwip_bind(listenfd, (struct sockaddr *) &brownlazy_saddr, sizeof(brownlazy_saddr)) == -1)
+        LWIP_ASSERT("brownlazy_main(): socket bind failed.", 0);
 
     /* Put socket into listening mode */
-    if (listen(listenfd, 3) == -1)
+    if (lwip_listen(listenfd, 3) == -1)
         LWIP_ASSERT("brownlazy_main(): Listen failed.", 0);
 
     /* Wait forever for network input: This could be connections or data */
     for (;;) {
         unsigned clilen = sizeof(brownlazy_caddr);
-        int newsockfd = accept(listenfd, (struct sockaddr *)&brownlazy_caddr, &clilen);
+        int newsockfd = lwip_accept(listenfd, (struct sockaddr *)&brownlazy_caddr, &clilen);
+        printf("brownlazy_main(): got conn from port %d\n",
+                ntohs(brownlazy_caddr.sin_port));
         if (newsockfd < 0) {
-            perror("ERROR on accept");
+            perror("brownlazy_main(): error on accept");
             continue;
         }
-        int err = send(newsockfd,SEND_STR,SEND_LEN,0);
-        close(newsockfd);
+        int err = lwip_send(newsockfd,SEND_STR,SEND_LEN,0);
+        lwip_close(newsockfd);
         if (err < 0) {
-            perror("ERROR writing to socket");
+            perror("brownlazy_main(): error writing to socket");
         }
+        break;  // only deal with one client
     }
+    printf("brownlazy_main(): server bye\n");
 }
 
+static void
+brownlazy_guest(void* arg)
+{
+    printf("brownlazy_guest(): hello\n");
+    LWIP_UNUSED_ARG(arg);
+    int connfd;
+    struct sockaddr_in brownlazy_saddr;
+
+    connfd = lwip_socket(AF_INET, SOCK_STREAM, 0);
+    LWIP_ASSERT("brownlazy_guest(): socket failed", connfd >= 0);
+    memset(&brownlazy_saddr, 0, sizeof(brownlazy_saddr));
+    brownlazy_saddr.sin_family = AF_INET;
+    brownlazy_saddr.sin_addr.s_addr = PP_HTONL(INADDR_LOOPBACK);
+    brownlazy_saddr.sin_port = htons(19);     /* Chargen server port */
+
+    int n_tries = 5;
+    while (lwip_connect(connfd, &brownlazy_saddr, sizeof(brownlazy_saddr)) < 0) {
+        perror("brownlazy_guest(): connect failed\n");
+        if (n_tries-- == 0) break;
+    }
+    if (n_tries < 0) {
+        printf("brownlazy_guest(): failed for too many times\n");
+    } else {
+        printf("brownlazy_guest(): connected to server\n");
+        char recvbuf[15];
+        int n_recv = lwip_recv(connfd, recvbuf, sizeof(recvbuf)-1, 0);
+        if (n_recv < 0)
+            perror("brownlazy_guest(): receive failed\n");
+        recvbuf[n_recv] = 0;
+        printf("brownlazy_guest(): got: %s\n", recvbuf);
+        printf("brownlazy_guest(): guest bye\n");
+    }
+}
 
 
 
@@ -110,24 +148,22 @@ init_netifs(void* arg)
     netif_set_default(netif_add(&netif,&ipaddr, &netmask, &gw, NULL, tapif_init,
                 tcpip_input));
     netif_set_up(&netif);
-
-    sys_thread_new("brownlazy", brownlazy_main, 0, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
 }
 
 
 int
 main(int argc, char **argv)
 {
-    IP4_ADDR(&gw, 192,168,0,1);
-    IP4_ADDR(&netmask, 255,255,255,0);
-    IP4_ADDR(&ipaddr, 192,168,0,2);
+//    IP4_ADDR(&gw, 127,168,0,1);
+//    IP4_ADDR(&netmask, 255,255,255,0);
+//    IP4_ADDR(&ipaddr, 192,168,0,2);
+//    printf("H 192.168.0.2;   M 255.255.255.0;   G 192.168.0.1\n");
 
-    printf("H 192.168.0.2;   M 255.255.255.0;   G 192.168.0.1\n");
-
-    printf("System initialized.\n");
-
-    tcpip_init(init_netifs, NULL);
+    tcpip_init(NULL, NULL);
     printf("TCP/IP initialized.\n");
+
+    sys_thread_new("brownlazy", brownlazy_main, 0, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
+    sys_thread_new("guest", brownlazy_guest, 0, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
 
     // spin
     while (1) ;

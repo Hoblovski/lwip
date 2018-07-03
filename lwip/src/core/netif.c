@@ -76,7 +76,7 @@ struct netif *netif_list;
 struct netif *netif_default;
 
 #if LWIP_HAVE_LOOPIF
-static struct netif loop_netif;
+struct netif loop_netif;
 
 /**
  * Initialize a lwip network interface structure for a loopback interface
@@ -114,6 +114,7 @@ netif_init(void)
 #else  /* NO_SYS */
   netif_add(&loop_netif, &loop_ipaddr, &loop_netmask, &loop_gw, NULL, netif_loopif_init, tcpip_input);
 #endif /* NO_SYS */
+  netif_set_default(&loop_netif);
   netif_set_up(&loop_netif);
 
 #endif /* LWIP_HAVE_LOOPIF */
