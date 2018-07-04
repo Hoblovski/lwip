@@ -43,20 +43,10 @@
 #include "lwip/tcp_impl.h"
 #include "lwip/tcpip.h"
 #include "lwip/sockets.h"
-#include "netif/tapif.h"
-#include "netif/tunif.h"
-#include "netif/unixif.h"
-#include "netif/dropif.h"
-#include "netif/pcapif.h"
-#include "netif/tcpdump.h"
 #include "ipv4/ip_addr.h"
 
 
 unsigned char debug_flags = LWIP_DBG_OFF;
-/* for lwip you have to setup interfaces manually */
-static ip_addr_t ipaddr, netmask, gw;
-struct netif netif;
-
 
 #define SEND_STR "brown lazy"
 #define SEND_LEN 10
@@ -140,25 +130,9 @@ brownlazy_guest(void* arg)
 }
 
 
-
-static void
-init_netifs(void* arg)
-{
-    // no dhcp
-    netif_set_default(netif_add(&netif,&ipaddr, &netmask, &gw, NULL, tapif_init,
-                tcpip_input));
-    netif_set_up(&netif);
-}
-
-
 int
 main(int argc, char **argv)
 {
-//    IP4_ADDR(&gw, 127,168,0,1);
-//    IP4_ADDR(&netmask, 255,255,255,0);
-//    IP4_ADDR(&ipaddr, 192,168,0,2);
-//    printf("H 192.168.0.2;   M 255.255.255.0;   G 192.168.0.1\n");
-
     tcpip_init(NULL, NULL);
     printf("TCP/IP initialized.\n");
 

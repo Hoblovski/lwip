@@ -176,9 +176,9 @@ a lot of data that needs to be copied, this should be set high. */
 #define TCP_SYNMAXRTX           4
 
 /* ---------- ARP options ---------- */
-#define LWIP_ARP                1
+#define LWIP_ARP                0
 #define ARP_TABLE_SIZE          10
-#define ARP_QUEUEING            1
+#define ARP_QUEUEING            0
 
 /* ---------- IP options ---------- */
 /* Define IP_FORWARD to 1 if you wish to have the ability to forward

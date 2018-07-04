@@ -46,13 +46,13 @@ CFLAGS=-g -Wall -D$(ARCH) -DIPv4 -DLWIP_DEBUG -pedantic \
 # -ansi
 # -std=c89
 LDFLAGS=-pthread -lutil
-CONTRIBDIR=../../../..
-LWIPARCH=$(CONTRIBDIR)/ports/unix
+CONTRIBDIR=.
 ARFLAGS=rs
 
 #Set this to where you have the lwip core module checked out from CVS
 #default assumes it's a dir named lwip at the same level as the contrib module
 LWIPDIR=$(CONTRIBDIR)/../lwip/src
+LWIPARCH=$(LWIPDIR)/arch/$(ARCH)
 
 CFLAGS:=$(CFLAGS)\
 	-I.\
@@ -79,13 +79,13 @@ APIFILES=$(LWIPDIR)/api/api_lib.c $(LWIPDIR)/api/api_msg.c $(LWIPDIR)/api/tcpip.
 	$(LWIPDIR)/api/err.c $(LWIPDIR)/api/sockets.c $(LWIPDIR)/api/netbuf.c $(LWIPDIR)/api/netdb.c
 
 # ARCHFILES: Architecture specific files.
-ARCHFILES=$(wildcard $(LWIPARCH)/*.c $(LWIPARCH)/netif/tapif.c $(LWIPARCH)/netif/tunif.c $(LWIPARCH)/netif/unixif.c $(LWIPARCH)/netif/list.c $(LWIPARCH)/netif/tcpdump.c)
+ARCHFILES=$(wildcard $(LWIPARCH)/*.c)
 
 # APPFILES: Applications.
 APPFILES=
 	
 # NETIFFILES: Files implementing various generic network interface functions.'
-NETIFFILES=$(LWIPDIR)/netif/etharp.c $(LWIPDIR)/netif/slipif.c
+NETIFFILES=
 
 # LWIPFILES: All the above.
 LWIPFILES=$(COREFILES) $(CORE4FILES) $(SNMPFILES) $(APIFILES) $(NETIFFILES) $(ARCHFILES)
