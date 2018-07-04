@@ -58,8 +58,6 @@
 #include "lwip/opt.h"
 #include "lwip/stats.h"
 
-static struct timeval starttime;
-
 #if !NO_SYS
 
 static struct sys_thread *threads = NULL;
@@ -509,137 +507,11 @@ sys_sem_free(struct sys_sem **sem)
 }
 #endif /* !NO_SYS */
 /*-----------------------------------------------------------------------------------*/
-u32_t
-sys_now(void)
-{
-#if SYSSVC_WATCH
-  printf("sys_now\n");
-#endif
-  struct timeval tv;
-  u32_t sec, usec, msec;
-  gettimeofday(&tv, NULL);
-
-  sec = (u32_t)(tv.tv_sec - starttime.tv_sec);
-  usec = (u32_t)(tv.tv_usec - starttime.tv_usec);
-  msec = sec * 1000 + usec / 1000;
-
-  return msec;
-}
-/*-----------------------------------------------------------------------------------*/
 void
 sys_init(void)
 {
 #if SYSSVC_WATCH
   printf("sys_init\n");
 #endif
-  gettimeofday(&starttime, NULL);
 }
 /*-----------------------------------------------------------------------------------*/
-#if SYS_LIGHTWEIGHT_PROT
-/** sys_prot_t sys_arch_protect(void)
-
-This optional function does a "fast" critical region protection and returns
-the previous protection level. This function is only called during very short
-critical regions. An embedded system which supports ISR-based drivers might
-want to implement this function by disabling interrupts. Task-based systems
-might want to implement this by using a mutex or disabling tasking. This
-function should support recursive calls from the same task or interrupt. In
-other words, sys_arch_protect() could be called while already protected. In
-that case the return value indicates that it is already protected.
-
-sys_arch_protect() is only required if your port is supporting an operating
-system.
-*/
-sys_prot_t
-sys_arch_protect(void)
-{
-#if SYSSVC_WATCH
-  printf("sys_arch_protect\n");
-#endif
-    /* Note that for the UNIX port, we are using a lightweight mutex, and our
-     * own counter (which is locked by the mutex). The return code is not actually
-     * used. */
-    if (lwprot_thread != pthread_self())
-    {
-        /* We are locking the mutex where it has not been locked before *
-        * or is being locked by another thread */
-        pthread_mutex_lock(&lwprot_mutex);
-        lwprot_thread = pthread_self();
-        lwprot_count = 1;
-    }
-    else
-        /* It is already locked by THIS thread */
-        lwprot_count++;
-    return 0;
-}
-/*-----------------------------------------------------------------------------------*/
-/** void sys_arch_unprotect(sys_prot_t pval)
-
-This optional function does a "fast" set of critical region protection to the
-value specified by pval. See the documentation for sys_arch_protect() for
-more information. This function is only required if your port is supporting
-an operating system.
-*/
-void
-sys_arch_unprotect(sys_prot_t pval)
-{
-#if SYSSVC_WATCH
-  printf("sys_arch_unprotect\n");
-#endif
-    LWIP_UNUSED_ARG(pval);
-    if (lwprot_thread == pthread_self())
-    {
-        if (--lwprot_count == 0)
-        {
-            lwprot_thread = (pthread_t) 0xDEAD;
-            pthread_mutex_unlock(&lwprot_mutex);
-        }
-    }
-}
-#endif /* SYS_LIGHTWEIGHT_PROT */
-
-/*-----------------------------------------------------------------------------------*/
-
-#ifndef MAX_JIFFY_OFFSET
-#define MAX_JIFFY_OFFSET ((~0U >> 1)-1)
-#endif
-
-#ifndef HZ
-#define HZ 100
-#endif
-
-u32_t
-sys_jiffies(void)
-{
-#if SYSSVC_WATCH
-  printf("sys_jiffies\n");
-#endif
-    struct timeval tv;
-    unsigned long sec;
-    long usec;
-
-    gettimeofday(&tv,NULL);
-    sec = tv.tv_sec - starttime.tv_sec;
-    usec = tv.tv_usec;
-
-    if (sec >= (MAX_JIFFY_OFFSET / HZ))
-      return MAX_JIFFY_OFFSET;
-    usec += 1000000L / HZ - 1;
-    usec /= 1000000L / HZ;
-    return HZ * sec + usec;
-}
-
-#if PPP_DEBUG
-
-#include <stdarg.h>
-
-void ppp_trace(int level, const char *format, ...)
-{
-    va_list args;
-
-    (void)level;
-    va_start(args, format);
-    vprintf(format, args);
-    va_end(args);
-}
-#endif
