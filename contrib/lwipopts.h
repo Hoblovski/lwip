@@ -143,6 +143,8 @@ a lot of data that needs to be copied, this should be set high. */
  */
 #define SYS_LIGHTWEIGHT_PROT           0
 
+#undef LWIP_DEBUG 
+
 /* ---------- TCP options ---------- */
 #define LWIP_TCP                1
 #define TCP_TTL                 255

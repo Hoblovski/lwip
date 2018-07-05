@@ -119,5 +119,5 @@ $(LWIPLIB): $(LWIPOBJS)
 	$(CCDEP) $(CFLAGS) -MM $^ > .depend || rm -f .depend
 
 brownlazy: .depend $(LWIPLIB) $(APPLIB) brownlazy.o $(APPFILES)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o brownlazy brownlazy.o -static $(APPLIB) $(LWIPLIB)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o brownlazy brownlazy.o -static
 

@@ -30,26 +30,22 @@
  *
  */
 
-#include <unistd.h>
 #include <fcntl.h>
 #include <getopt.h>
+#include <pthread.h>
 
-#include "lwip/opt.h"
-#include "lwip/init.h"
-#include "lwip/mem.h"
-#include "lwip/memp.h"
-#include "lwip/sys.h"
-#include "lwip/stats.h"
-#include "lwip/tcp_impl.h"
-#include "lwip/tcpip.h"
-#include "lwip/sockets.h"
-#include "ipv4/ip_addr.h"
+#include <lwip/def.h>
+#include <lwip/tcpip.h>
+#include <lwip/sockets.h>
 
-
-unsigned char debug_flags = LWIP_DBG_OFF;
+#include <unistd.h>
+#include <sys/syscall.h>
 
 #define SEND_STR "brown lazy"
 #define SEND_LEN 10
+
+int ready = 0;
+int sent = 0;
 
 static void
 brownlazy_main(void *arg)
@@ -57,36 +53,44 @@ brownlazy_main(void *arg)
     printf("brownlazy_main(): hello\n");
     int listenfd;
     struct sockaddr_in brownlazy_saddr, brownlazy_caddr;
-    LWIP_UNUSED_ARG(arg);
 
     /* First acquire our socket for listening for connections */
-    listenfd = lwip_socket(AF_INET, SOCK_STREAM, 0);
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
 
-    LWIP_ASSERT("brownlazy_main(): socket create failed.", listenfd >= 0);
+    if (listenfd < 0) {
+        printf("brownlazy_main(): socket create failed.");
+        return;
+    }
     memset(&brownlazy_saddr, 0, sizeof(brownlazy_saddr));
     brownlazy_saddr.sin_family = AF_INET;
     brownlazy_saddr.sin_addr.s_addr = PP_HTONL(INADDR_ANY);
-    brownlazy_saddr.sin_port = htons(19);     /* Chargen server port */
+    brownlazy_saddr.sin_port = PP_HTONS(19);     /* Chargen server port */
 
-    if (lwip_bind(listenfd, (struct sockaddr *) &brownlazy_saddr, sizeof(brownlazy_saddr)) == -1)
-        LWIP_ASSERT("brownlazy_main(): socket bind failed.", 0);
+    if (bind(listenfd, (struct sockaddr *) &brownlazy_saddr, sizeof(brownlazy_saddr)) == -1) {
+        printf("brownlazy_main(): socket bind failed.");
+        return;
+    }
 
     /* Put socket into listening mode */
-    if (lwip_listen(listenfd, 3) == -1)
-        LWIP_ASSERT("brownlazy_main(): Listen failed.", 0);
+    if (listen(listenfd, 3) == -1) {
+        printf("brownlazy_main(): Listen failed.");
+        return;
+    }
 
     /* Wait forever for network input: This could be connections or data */
+    ready = 1;
     for (;;) {
         unsigned clilen = sizeof(brownlazy_caddr);
-        int newsockfd = lwip_accept(listenfd, (struct sockaddr *)&brownlazy_caddr, &clilen);
+        int newsockfd = accept(listenfd, (struct sockaddr *)&brownlazy_caddr, &clilen);
         printf("brownlazy_main(): got conn from port %d\n",
-                ntohs(brownlazy_caddr.sin_port));
+                PP_NTOHS(brownlazy_caddr.sin_port));
         if (newsockfd < 0) {
             perror("brownlazy_main(): error on accept");
             continue;
         }
-        int err = lwip_send(newsockfd,SEND_STR,SEND_LEN,0);
-        lwip_close(newsockfd);
+        int err = syscall(334,newsockfd,SEND_STR,SEND_LEN,0);
+        // syscall(333,newsockfd);
+        sent = 1;
         if (err < 0) {
             perror("brownlazy_main(): error writing to socket");
         }
@@ -99,19 +103,21 @@ static void
 brownlazy_guest(void* arg)
 {
     printf("brownlazy_guest(): hello\n");
-    LWIP_UNUSED_ARG(arg);
     int connfd;
     struct sockaddr_in brownlazy_saddr;
 
-    connfd = lwip_socket(AF_INET, SOCK_STREAM, 0);
-    LWIP_ASSERT("brownlazy_guest(): socket failed", connfd >= 0);
+    connfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (connfd < 0) {
+        printf("brownlazy_guest(): socket failed");
+        return;
+    }
     memset(&brownlazy_saddr, 0, sizeof(brownlazy_saddr));
     brownlazy_saddr.sin_family = AF_INET;
     brownlazy_saddr.sin_addr.s_addr = PP_HTONL(INADDR_LOOPBACK);
-    brownlazy_saddr.sin_port = htons(19);     /* Chargen server port */
+    brownlazy_saddr.sin_port = PP_HTONS(19);     /* Chargen server port */
 
     int n_tries = 5;
-    while (lwip_connect(connfd, &brownlazy_saddr, sizeof(brownlazy_saddr)) < 0) {
+    while (syscall(SYS_connect, connfd, &brownlazy_saddr, sizeof(brownlazy_saddr)) < 0) {
         perror("brownlazy_guest(): connect failed\n");
         if (n_tries-- == 0) break;
     }
@@ -120,24 +126,27 @@ brownlazy_guest(void* arg)
     } else {
         printf("brownlazy_guest(): connected to server\n");
         char recvbuf[15];
-        int n_recv = lwip_recv(connfd, recvbuf, sizeof(recvbuf)-1, 0);
+        while (!sent);
+        int n_recv = syscall(335, connfd, recvbuf, sizeof(recvbuf)-1, 0);
         if (n_recv < 0)
             perror("brownlazy_guest(): receive failed\n");
         recvbuf[n_recv] = 0;
         printf("brownlazy_guest(): got: %s\n", recvbuf);
         printf("brownlazy_guest(): guest bye\n");
     }
+    // syscall(333,connfd);
 }
 
 
 int
-main(int argc, char **argv)
+main()
 {
-    tcpip_init(NULL, NULL);
-    printf("TCP/IP initialized.\n");
-
-    sys_thread_new("brownlazy", brownlazy_main, 0, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
-    sys_thread_new("guest", brownlazy_guest, 0, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
+    pthread_t pa, pb;
+    pthread_create(&pa, NULL,
+            brownlazy_main, NULL);
+    while (!ready);
+    pthread_create(&pb, NULL,
+            brownlazy_guest, NULL);
 
     // spin
     while (1) ;
