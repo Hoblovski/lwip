@@ -46,6 +46,12 @@
 
 int ready = 0;
 int sent = 0;
+int recvd = 0;
+
+#define lwip_SYS_closesock 400
+#define lwip_SYS_send 401
+#define lwip_SYS_recv 402
+
 
 static void
 brownlazy_main(void *arg)
@@ -88,12 +94,15 @@ brownlazy_main(void *arg)
             perror("brownlazy_main(): error on accept");
             continue;
         }
-        int err = syscall(334,newsockfd,SEND_STR,SEND_LEN,0);
-        // syscall(333,newsockfd);
+	// send
+        int err = syscall(lwip_SYS_send, newsockfd, SEND_STR, SEND_LEN, 0);
         sent = 1;
         if (err < 0) {
             perror("brownlazy_main(): error writing to socket");
         }
+	// close
+	while (!recvd);
+	syscall(lwip_SYS_closesock, newsockfd);
         break;  // only deal with one client
     }
     printf("brownlazy_main(): server bye\n");
@@ -127,14 +136,16 @@ brownlazy_guest(void* arg)
         printf("brownlazy_guest(): connected to server\n");
         char recvbuf[15];
         while (!sent);
-        int n_recv = syscall(335, connfd, recvbuf, sizeof(recvbuf)-1, 0);
+	// recv
+        int n_recv = syscall(lwip_SYS_recv, connfd, recvbuf, sizeof(recvbuf)-1, 0);
         if (n_recv < 0)
             perror("brownlazy_guest(): receive failed\n");
+	recvd = 1;
         recvbuf[n_recv] = 0;
         printf("brownlazy_guest(): got: %s\n", recvbuf);
         printf("brownlazy_guest(): guest bye\n");
     }
-    // syscall(333,connfd);
+    syscall(lwip_SYS_closesock, connfd);
 }
 
 
@@ -148,7 +159,7 @@ main()
     pthread_create(&pb, NULL,
             brownlazy_guest, NULL);
 
-    // spin
-    while (1) ;
+    pthread_join(pa, NULL);
+    pthread_join(pb, NULL);
 }
 /*-----------------------------------------------------------------------------------*/
